@@ -1,21 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TaskCard from "../components/TaskCard";
 import TaskForm from "../components/TaskForm";
 
-const initialTasks = [
-  {
-    id: 1,
-    titre: "Conception de l'ontologie",
-    description: "Rédiger les axiomes de base du domaine.",
-    statut: "A faire",
-  },
-  {
-    id: 2,
-    titre: "Développement de l'API",
-    description: "Implémenter les endpoints REST.",
-    statut: "En cours",
-  },
-];
+const [tasks, setTasks] = useState(() => {
+  const donneesSauvegardees = localStorage.getItem("taskflow_data");
+  return donneesSauvegardees ? JSON.parse(donneesSauvegardees) : [];
+});
+
+useEffect(() => {
+  localStorage.setItem("taskflow_data", JSON.stringify(tasks));
+}, [tasks]);
 
 const handleAddTask = (nouvelleTache) => {
   setTasks([...tasks, nouvelleTache]); 

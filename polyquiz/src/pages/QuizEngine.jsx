@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useRef } from "react";
+import { useReducer, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import useFetch from "../hooks/useFetch";
@@ -46,14 +46,10 @@ export default function QuizEngine() {
   const navigate = useNavigate();
 
   const intervalRef = useRef(null);
-  const [tempsRestant, setTempsRestant] = useReducer(
-    (t, action) => action === "RESET" ? 60 : t - 1,
-    60
-  );
-
+  const [tempsRestant, setTempsRestant] = useState(60);
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      setTempsRestant("TICK");
+      setTempsRestant(t => t - 1);
     }, 1000);
 
     return () => clearInterval(intervalRef.current); 
@@ -67,15 +63,19 @@ export default function QuizEngine() {
   }, [tempsRestant]);
 
   useEffect(() => {
-    if (state.statut === "termine") {
+    if (state.statut === "termine" && questions) {
       clearInterval(intervalRef.current);
       sauvegarderScore(state.score);
-      navigate("/resultats", { state: { score: state.score, total: questions?.length } });
+      navigate("/resultats", { state: { score: state.score, total: questions.length } });
     }
-  }, [state.statut]);
+  }, [state.statut, questions]);
 
   if (loading) return <p style={{ textAlign: "center", marginTop: "3rem" }}>Chargement des questions…</p>;
   if (error)   return <p style={{ color: "red", textAlign: "center" }}>Erreur : {error}</p>;
+  if (!questions || questions.length === 0)
+              return <p style={{ textAlign: "center" }}>Aucune question trouvée.</p>;
+  if (state.statut === "termine")
+              return <p style={{ textAlign: "center", marginTop: "3rem" }}>Calcul du score…</p>;
 
   const question = questions[state.indexQuestion];
 

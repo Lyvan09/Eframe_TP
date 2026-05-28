@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
+
 export default function Resultats() {
   const { state }               = useLocation();
   const { pseudo, meilleurScore } = useUser();
@@ -10,6 +11,16 @@ export default function Resultats() {
 
   const score = state?.score ?? 0;
   const total = state?.total ?? 10;
+
+    if (!state?.score === undefined || !state) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "3rem" }}>
+        <p>Aucun résultat disponible.</p>
+        <button onClick={() => navigate("/")}>Retour à l'accueil</button>
+      </div>
+    );
+  }
+
 
   const ratio = useMemo(() => {
     console.log("Calcul du ratio — ne s'exécute qu'une fois");
